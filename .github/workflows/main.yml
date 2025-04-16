@@ -1,0 +1,42 @@
+name: Deploy FastAPI to Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15  # 防止网络超时卡死
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install rsync (for incremental transfer)
+      run: sudo apt-get install -y rsync
+
+    - name: Push code to server via rsync
+      uses: burnett01/rsync-deployments@5.2.3
+      with:
+        switches: -arcvz --delete --exclude="*.pyc" --exclude='__pycache__'  --progress   # 增量同步并删除冗余文件
+        path: ./                 # 同步当前目录所有文件
+        remote_path: /srv/ops/apps/deepiano-api/
+        remote_host: ${{ secrets.SERVER_IP }}
+        remote_user: ${{ secrets.SERVER_USER }}
+        remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Run deployment script on server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}　
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          /srv/ops/bin/ops_deploy.sh      # 执行本地部署脚本
+          echo "Deployment completed!"
