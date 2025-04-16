@@ -23,7 +23,11 @@ jobs:
         echo "remote_host variable : $remote_host"
         echo "remote_user variable : $remote_user"
         echo "remote_key variable : $remote_key"
-        echo "=======${{ vars.SERVER_IP }}======"
+        echo "vars.prod_deploy.SERVER_IP: ${{ vars.prod_deploy.SERVER_IP }}"
+        echo "prod_deploy.vars.SERVER_IP: ${{ prod_deploy.vars.SERVER_IP }}"
+        echo "secrets.SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}"
+        echo "secrets.prod_deploy.SSH_PRIVATE_KEY: ${{ secrets.prod_deploy.SSH_PRIVATE_KEY }}"
+        
       env:
         remote_host: ${{ vars.SERVER_IP }}
         remote_user: ${{ vars.SERVER_USER }}
