@@ -22,7 +22,7 @@ jobs:
       run: sudo apt-get install -y rsync
 
     - name: Push code to server via rsync
-      uses: burnett01/rsync-deployments@5.2.3
+      uses: burnett01/rsync-deployments@7.0.2
       with:
         switches: -arcvz --delete --exclude="*.pyc" --exclude='__pycache__'  --progress   # 增量同步并删除冗余文件
         path: ./                 # 同步当前目录所有文件
