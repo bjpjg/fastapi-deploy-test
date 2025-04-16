@@ -23,6 +23,7 @@ jobs:
         echo "remote_host variable : $remote_host"
         echo "remote_user variable : $remote_user"
         echo "remote_key variable : $remote_key"
+        echo "=======${{ vars.SERVER_IP }}======"
       env:
         remote_host: ${{ vars.SERVER_IP }}
         remote_user: ${{ vars.SERVER_USER }}
