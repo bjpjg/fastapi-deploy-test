@@ -18,6 +18,16 @@ jobs:
       with:
         python-version: '3.12'
 
+    - name: Use variables
+      run: |
+        echo "remote_host variable : $remote_host"
+        echo "remote_user variable : $remote_user"
+        echo "remote_key variable : $remote_key"
+      env:
+        remote_host: ${{ vars.SERVER_IP }}
+        remote_user: ${{ vars.SERVER_USER }}
+        remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Install rsync (for incremental transfer)
       run: sudo apt-get install -y rsync
 
