@@ -35,9 +35,6 @@ jobs:
     - name: Install rsync (for incremental transfer)
       run: sudo apt-get install -y rsync
 
-    - name: rm known_hosts
-      run: rm ~/.ssh/known_hosts
-
     # - name: Push code to server via rsync
     #   uses: burnett01/rsync-deployments@7.0.2
     #   with:
