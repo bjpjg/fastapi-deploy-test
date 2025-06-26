@@ -1,0 +1,36 @@
+name: Code Formatting
+on:
+  push:
+    branches: [ main ]
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install code formatters
+        run: |
+          pip install black isort flake8
+      - name: Run formatters
+        run: |
+          black .
+          isort .
+      - name: Check for changes
+        id: changes
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            echo "CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "CHANGES=false" >> $GITHUB_ENV
+          fi
+      - name: Commit changes
+        if: env.CHANGES == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "chore: 自动代码格式化"
+          git push  

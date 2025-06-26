@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# 检查是否安装了black
+if ! command -v black &> /dev/null
+then
+    echo "black未安装，跳过代码格式化"
+    exit 0
+fi
+
+# 检查是否安装了isort
+if ! command -v isort &> /dev/null
+then
+    echo "isort未安装，跳过导入排序"
+else
+    isort .
+fi
+
+# 格式化代码
+black .
+
+# 添加修改
+git add .
+
+exit 0  

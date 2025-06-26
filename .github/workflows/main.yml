@@ -38,21 +38,22 @@ jobs:
       - name: 设置环境变量
         id: set-env
         run: |
-          echo github.ref="${{ github.ref }}"
-          echo github.sha="${{ github.sha }}"
+          echo "GIT_DEPLOY_VERSION=${{ github.sha }}" >> $GITHUB_ENV
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENVIRONMENT=production" >> $GITHUB_ENV
-            echo "部署目标环境：生产环境"
-          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
-            echo "部署目标环境：预发布环境"
-          elif [[ "${{ github.ref }}" == refs/heads/feature/* ]]; then
-            echo "ENVIRONMENT=development" >> $GITHUB_ENV
-            echo "部署目标环境：开发环境"
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+            echo "部署环境: prod生产环境"
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+            echo "部署环境: dev开发环境"
+          elif [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
+            echo "ENVIRONMENT=pre" >> $GITHUB_ENV
+            echo "部署环境: pre预发环境"
           else
-            echo "不支持在此分支部署"
+            echo "不支持此分支部署"
             exit 1
           fi
+          echo "部署分支: ${{ github.ref }}"
+          echo "GIT版本号: ${{ github.sha }}"
 
       - name: Install rsync (for incremental transfer)
         run: sudo apt-get install -y rsync
