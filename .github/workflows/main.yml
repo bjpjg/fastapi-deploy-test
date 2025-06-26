@@ -2,7 +2,10 @@ name: Deploy FastAPI to Server
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - dev
+      - release/*
 
 jobs:
   deploy:
@@ -31,6 +34,25 @@ jobs:
           remote_host: ${{ vars.SERVER_IP }}
           remote_user: ${{ vars.SERVER_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 设置环境变量
+        id: set-env
+        run: |
+          echo github.ref="${{ github.ref }}"
+          echo github.sha="${{ github.sha }}"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "部署目标环境：生产环境"
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            echo "部署目标环境：预发布环境"
+          elif [[ "${{ github.ref }}" == refs/heads/feature/* ]]; then
+            echo "ENVIRONMENT=development" >> $GITHUB_ENV
+            echo "部署目标环境：开发环境"
+          else
+            echo "不支持在此分支部署"
+            exit 1
+          fi
 
       - name: Install rsync (for incremental transfer)
         run: sudo apt-get install -y rsync
@@ -63,4 +85,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/workplace/ops/apps
-            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l prod-deepiano-api deepiano-api.yml
+            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l deepiano-api-prod deepiano-api.yml
