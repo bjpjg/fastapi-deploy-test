@@ -105,6 +105,7 @@ jobs:
           host: ${{ vars.SERVER_IP }}
           username: ${{ vars.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: PROJECT_NAME,REMOTE_PROJECT_DIR,GIT_DEPLOY_VERSION
           script: |
             cd /home/ubuntu/workplace/ops/apps
-            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l deepiano-api-prod deepiano-api.yml
+            ansible-playbook deepiano-api.yml -i hosts.d/deepiano-api-hosts.yaml  -l $PROJECT_NAME -e "REMOTE_PROJECT_DIR=$REMOTE_PROJECT_DIR deploy_version=$GIT_DEPLOY_VERSION"
