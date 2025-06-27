@@ -16,9 +16,11 @@ class Item(BaseModel):
     is_offer: Union[bool, None] = None
 
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 
 @app.get("/items/{item_id}")
