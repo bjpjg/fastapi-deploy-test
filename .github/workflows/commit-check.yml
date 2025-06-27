@@ -12,14 +12,15 @@ jobs:
       - name: Check commit messages
         run: |
           # 定义提交信息格式规则
-          commit_pattern='^(fix|feat|docs|style|refactor|test|chore|perf|ci):\s[a-z0-9].{3,}$'
+          commit_pattern='^(fix|feat|docs|style|refactor|test|chore|perf|ci)(\(\w{1,20}\))?: (.{1,80})$'
           
           # 获取所有提交信息并检查格式
           for commit in $(git log --format='%H' origin/main..HEAD); do
             message=$(git log -1 --format='%s' $commit)
             if ! [[ $message =~ $commit_pattern ]]; then
-              echo "错误: 提交信息 '$message' 不符合格式要求"
-              echo "格式应为: '类型: 描述'，例如 'fix: 修复登录问题'"
+              echo "错误: 提交信息不符合格式要求($message)"
+              echo "正确格式: <类型>[(<范围>)]: <描述>"
+              echo "字符限制: 范围-限制20字符  描述-限制80字符"
               exit 1
             fi
           done  
