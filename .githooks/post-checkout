@@ -1,0 +1,4 @@
+#!/bin/sh
+# 自动配置Git钩子路径
+git config core.hooksPath .githooks
+echo "✅ Git钩子已自动配置为使用 .githooks 目录"

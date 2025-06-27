@@ -1,24 +1,45 @@
 #!/bin/sh
 
-# 检查是否安装了black
-if ! command -v black &> /dev/null
-then
-    echo "black未安装，跳过代码格式化"
-    exit 0
+# 提交前自动格式化 Python 代码并删除无效导入
+
+# 确保脚本在项目根目录执行
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# 检查是否安装了必要的工具
+check_command() {
+  command -v "$1" >/dev/null 2>&1 || { echo >&2 "错误: 需要安装 $1"; exit 1; }
+}
+
+check_command black
+check_command isort
+check_command autoflake
+
+# 获取所有被修改的 Python 文件
+PY_FILES=$(git diff --cached --name-only --diff-filter=ACMRTUXB | grep '\.py$')
+
+if [ -z "$PY_FILES" ]; then
+  exit 0  # 没有 Python 文件被修改，跳过格式化
 fi
 
-# 检查是否安装了isort
-if ! command -v isort &> /dev/null
-then
-    echo "isort未安装，跳过导入排序"
-else
-    isort .
-fi
+echo "正在格式化 Python 代码并删除无效导入..."
 
-# 格式化代码
-black .
+# 格式化并删除无效导入
+for file in $PY_FILES; do
+  echo ">>> $file"
+  # 删除未使用的导入
+  # autoflake --in-place --remove-all-unused-imports --remove-unused-variables "$file"
+  autoflake --in-place --remove-all-unused-imports "$file"
+  
+  # 排序导入语句
+  isort "$file"
+  
+  # 格式化代码
+  black --quiet "$file"
+  
+  # 将格式化后的文件添加到暂存区
+  git add "$file"
+done
 
-# 添加修改
-git add .
-
-exit 0  
+echo "✅ 代码自动格式化完成"
+echo "-----------------------------------------------\n"
+exit 0
