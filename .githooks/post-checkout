@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# 确保脚本在项目根目录执行
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
 # 自动配置Git钩子路径
 git config core.hooksPath .githooks
 echo "✅ Git钩子已自动配置为使用 .githooks 目录"

@@ -25,7 +25,7 @@ COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # 正则表达式模式：类型(可选范围): 描述
 printf -v ALLOW_TYPE "%s|" "${TYPES[@]}"
-PATTERN="^(${ALLOW_TYPE%|})(\(\w{1,20}\))?: (.*)$"
+PATTERN="^(${ALLOW_TYPE%|})(\(\w{1,20}\))?: (.{1,80})$"
 
 # 跳过Merge提交和rebase操作的校验
 if echo "$COMMIT_MSG" | grep -qE '^Merge|^#'; then
@@ -37,8 +37,9 @@ if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
   echo "错误: 提交信息格式不符合要求" >&2
   echo "" >&2
   echo "正确格式: <类型>[(<范围>)]: <描述>" >&2
+  echo "字符限制: 范围-限制20字符  描述-限制80字符" >&2
   echo "示例: fix(auth): fix the error for login" >&2
-  echo "示例: feat: JIRA-2218 新增用户权限控制" >&2
+  echo "示例: feat: JIRA-2218 新增权限控制" >&2
   echo "" >&2
   echo "允许的类型:" >&2
   printf -- '- %s\n' "${TYPES[@]}" >&2
