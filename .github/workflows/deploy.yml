@@ -69,10 +69,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            if [[ -d "${{ REMOTE_PROJECT_DIR }}" ]]; then
-              rm -rf "${{ REMOTE_PROJECT_DIR }}";
+            if [[ -d "${REMOTE_PROJECT_DIR}" ]]; then
+              rm -rf "${REMOTE_PROJECT_DIR}";
             fi
-            mkdir -p "${{ REMOTE_PROJECT_DIR }}"
+            mkdir -p "${REMOTE_PROJECT_DIR}"
 
       - name: Install rsync (for incremental transfer)
         run: sudo apt-get install -y rsync
@@ -82,7 +82,7 @@ jobs:
         with:
           switches: -arcvz --delete --exclude="*.pyc" --exclude='__pycache__'  --progress   # 增量同步并删除冗余文件
           path: ./                 # 同步当前目录所有文件
-          remote_path: ${{ REMOTE_PROJECT_DIR }}
+          remote_path: ${REMOTE_PROJECT_DIR}
           remote_host: 47.93.86.147
           remote_user: ubuntu
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -105,4 +105,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/workplace/ops/apps
-            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l ${{ PROJECT_NAME }} deepiano-api.yml
+            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l ${PROJECT_NAME} deepiano-api.yml
