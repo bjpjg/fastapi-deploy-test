@@ -64,10 +64,13 @@ jobs:
 
       - name: Init remote project directory
         uses: appleboy/ssh-action@master
+        env:
+          REMOTE_PROJECT_DIR: ${REMOTE_PROJECT_DIR}
         with:
           host: 47.93.86.147
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REMOTE_PROJECT_DIR
           script: |
             if [[ -d "${REMOTE_PROJECT_DIR}" ]]; then
               rm -rf "${REMOTE_PROJECT_DIR}";
