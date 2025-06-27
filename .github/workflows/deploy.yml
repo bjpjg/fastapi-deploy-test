@@ -53,7 +53,7 @@ jobs:
           echo "GIT版本号: ${{ github.sha }}"
           echo "部署环境: $ENVIRONMENT"
           
-          PROJECT_NAME="deepiano-api-${$ENVIRONMENT}"
+          PROJECT_NAME="deepiano-api-${ENVIRONMENT}"
           REMOTE_PROJECT_DIR="/srv/ops/deploy/projects/${PROJECT_NAME}"
           echo "部署项目: ${PROJECT_NAME}"
           echo "源码路径: ${REMOTE_PROJECT_DIR}"

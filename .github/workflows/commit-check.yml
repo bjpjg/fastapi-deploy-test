@@ -13,7 +13,7 @@ jobs:
         run: |
           # 定义提交信息格式规则
           commit_pattern='^(fix|feat|docs|style|refactor|test|chore|perf|ci)(\([a-zA-Z0-9]{1,20}\))?: (.{1,80})$'
-          
+          echo "start check commit msg..."
           # 获取所有提交信息并检查格式
           for commit in $(git log --format='%H' origin/main..HEAD); do
             message=$(git log -1 --format='%s' $commit)
@@ -23,5 +23,8 @@ jobs:
               echo "正确格式: <类型>[(<范围>)]: <描述>"
               echo "字符限制: 范围-限制20字符  描述-限制80字符"
               exit 1
+            else
+              echo "$message"
+              echo "$commit_pattern"
             fi
           done  
