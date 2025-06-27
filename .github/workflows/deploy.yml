@@ -107,4 +107,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/workplace/ops/apps
-            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l ${PROJECT_NAME} deepiano-api.yml
+            ansible-playbook -i hosts.d/deepiano-api-hosts.yaml  -l deepiano-api-prod deepiano-api.yml
