@@ -2,7 +2,7 @@ import logging
 from typing import Union
 
 
-import os,sys,time
+import os, sys, time
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -18,11 +18,9 @@ class Item(BaseModel):
     is_offer: Union[bool, None] = None
 
 
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
 
 
 @app.get("/items/{item_id}")
@@ -41,5 +39,3 @@ if __name__ == "__main__":
         uvicorn.run("main:app", reload=True, host="0.0.0.0", port=8000)
     except Exception as e:
         logger.error(f"❌ FastAPI start filed: {e}")
-
-
