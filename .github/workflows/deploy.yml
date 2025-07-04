@@ -85,8 +85,8 @@ jobs:
           switches: -arcvz --delete --exclude="*.pyc" --exclude='__pycache__'  --progress   # 增量同步并删除冗余文件
           path: ./                 # 同步当前目录所有文件
           remote_path: ${OPS_LOCAL_PROJECT_SYNC_CODE}
-          remote_host: ${{ vars.SERVER_USER }}
-          remote_user: ubuntu
+          remote_host: ${{ vars.SERVER_IP }}
+          remote_user: ${{ vars.SERVER_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Run Ansible Playbook
