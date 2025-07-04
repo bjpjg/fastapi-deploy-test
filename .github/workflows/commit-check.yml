@@ -15,7 +15,7 @@ jobs:
           commit_pattern='^(fix|feat|docs|style|refactor|test|chore|perf|ci)(\([a-zA-Z0-9]{1,20}\))?: (.{1,80})$'
           echo "start check commit msg..."
           # 获取所有提交信息并检查格式
-          for commit in $(git log --format='%H' origin/main..HEAD); do
+          for commit in $(git rev-parse HEAD); do
             message=$(git log -1 --format='%s' $commit)
             echo ">>> message: $message"
             if [[ ! $message =~ $commit_pattern ]]; then
