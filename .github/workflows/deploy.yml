@@ -38,7 +38,7 @@ jobs:
       - name: 设置环境变量
         id: set-env
         run: |
-          echo "GIT_DEPLOY_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "DEPLOY_GIT_VERSION=${{ github.sha }}" >> $GITHUB_ENV
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             ENVIRONMENT=prod
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
@@ -53,28 +53,28 @@ jobs:
           echo "GIT版本号: ${{ github.sha }}"
           echo "部署环境: $ENVIRONMENT"
           
-          PROJECT_NAME="deepiano-api-${ENVIRONMENT}"
-          REMOTE_PROJECT_DIR="/srv/ops/deploy/projects/${PROJECT_NAME}"
-          echo "部署项目: ${PROJECT_NAME}"
-          echo "源码路径: ${REMOTE_PROJECT_DIR}"
+          APP_NAME="deepiano-api-${ENVIRONMENT}"
+          OPS_LOCAL_PROJECT_SYNC_CODE="/srv/ops/deploy/projects/${APP_NAME}"
+          echo "部署项目: ${APP_NAME}"
+          echo "源码路径: ${OPS_LOCAL_PROJECT_SYNC_CODE}"
           
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
-          echo "PROJECT_NAME=${PROJECT_NAME}" >> $GITHUB_ENV
-          echo "REMOTE_PROJECT_DIR=${REMOTE_PROJECT_DIR}" >> $GITHUB_ENV
+          echo "APP_NAME=${APP_NAME}" >> $GITHUB_ENV
+          echo "OPS_LOCAL_PROJECT_SYNC_CODE=${OPS_LOCAL_PROJECT_SYNC_CODE}" >> $GITHUB_ENV
 
-      - name: Init remote project directory
+      - name: Initialize the project code directory of the deployment server
         uses: appleboy/ssh-action@master
         with:
-          host: 47.93.86.147
-          username: ubuntu
+          host: ${{ vars.SERVER_IP }}
+          username: ${{ vars.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: REMOTE_PROJECT_DIR
+          envs: OPS_LOCAL_PROJECT_SYNC_CODE
           script: |
-            if [[ -d "${REMOTE_PROJECT_DIR}" ]]; then
-              rm -rf "${REMOTE_PROJECT_DIR}";
+            if [[ -d "${OPS_LOCAL_PROJECT_SYNC_CODE}" ]]; then
+              rm -rf "${OPS_LOCAL_PROJECT_SYNC_CODE}";
             fi
-            echo "目录: ${REMOTE_PROJECT_DIR}";
-            mkdir -p "${REMOTE_PROJECT_DIR}";
+            echo "目录: ${OPS_LOCAL_PROJECT_SYNC_CODE}";
+            mkdir -p "${OPS_LOCAL_PROJECT_SYNC_CODE}";
 
       - name: Install rsync (for incremental transfer)
         run: sudo apt-get install -y rsync
@@ -84,20 +84,10 @@ jobs:
         with:
           switches: -arcvz --delete --exclude="*.pyc" --exclude='__pycache__'  --progress   # 增量同步并删除冗余文件
           path: ./                 # 同步当前目录所有文件
-          remote_path: ${REMOTE_PROJECT_DIR}
-          remote_host: 47.93.86.147
+          remote_path: ${OPS_LOCAL_PROJECT_SYNC_CODE}
+          remote_host: ${{ vars.SERVER_USER }}
           remote_user: ubuntu
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Run deployment script on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: 47.93.86.147
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            /srv/ops/bin/ops_deploy.sh      # 执行本地部署脚本
-            echo "Deployment completed!"
 
       - name: Run Ansible Playbook
         uses: appleboy/ssh-action@master
@@ -105,7 +95,7 @@ jobs:
           host: ${{ vars.SERVER_IP }}
           username: ${{ vars.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PROJECT_NAME,REMOTE_PROJECT_DIR,GIT_DEPLOY_VERSION
+          envs: APP_NAME,OPS_LOCAL_PROJECT_SYNC_CODE,DEPLOY_GIT_VERSION
           script: |
-            cd /home/ubuntu/workplace/ops/apps
-            ansible-playbook deepiano-api.yml -i hosts.d/deepiano-api-hosts.yaml  -l $PROJECT_NAME -e "REMOTE_PROJECT_DIR=$REMOTE_PROJECT_DIR deploy_version=$GIT_DEPLOY_VERSION"
+            cd /srv/ops/ansible/apps
+            ansible-playbook deepiano-api.yml -i hosts.d/deepiano-api-hosts.yaml  -l $APP_NAME -e "$DEPLOY_GIT_VERSION=$DEPLOY_GIT_VERSION"
