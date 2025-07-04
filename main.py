@@ -41,3 +41,5 @@ if __name__ == "__main__":
         uvicorn.run("main:app", reload=True, host="0.0.0.0", port=8000)
     except Exception as e:
         logger.error(f"❌ FastAPI start filed: {e}")
+
+
