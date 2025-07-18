@@ -49,7 +49,8 @@ jobs:
             echo "不支持此分支部署"
             exit 1
           fi
-          PROJECT_NAME=${github.repository#*/}
+          GITHUB_REPOSITORY=${{github.repository}}
+          PROJECT_NAME=${GITHUB_REPOSITORY#*/}
           echo "部署项目: ${{ github.repository }}"
           echo "部署项目: ${PROJECT_NAME}"
           echo "部署分支: ${{ github.ref }}"
