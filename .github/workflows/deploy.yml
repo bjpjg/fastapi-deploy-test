@@ -37,8 +37,6 @@ jobs:
 
       - name: 设置环境变量
         id: set-env
-        env:
-          PROJECT_NAME: ${{ github.repository.split('/')[1] }}
         run: |
           echo "DEPLOY_GIT_VERSION=${{ github.sha }}" >> $GITHUB_ENV
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
@@ -51,13 +49,14 @@ jobs:
             echo "不支持此分支部署"
             exit 1
           fi
+          PROJECT_NAME=${github.repository#*/}
           echo "部署项目: ${{ github.repository }}"
           echo "部署项目: ${PROJECT_NAME}"
           echo "部署分支: ${{ github.ref }}"
           echo "GIT版本号: ${{ github.sha }}"
           echo "部署环境: $ENVIRONMENT"
           
-          APP_NAME="deepiano-api-${ENVIRONMENT}"
+          APP_NAME="$PROJECT_NAME-${ENVIRONMENT}"
           OPS_LOCAL_PROJECT_SYNC_CODE="/srv/ops/deploy/projects/${APP_NAME}"
           echo "部署项目: ${APP_NAME}"
           echo "源码路径: ${OPS_LOCAL_PROJECT_SYNC_CODE}"
